@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Waste Classifier</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h1>Waste Classifier</h1>
+    <p>Classify waste into specific categories for better recycling.</p>
+  </header>
+
+  <main>
+    <div class="upload-container">
+      <h2>Upload an Image</h2>
+      <form id="upload-form" action="/classify" method="post" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required />
+        <button type="submit">Classify</button>
+      </form>
+      <div id="result"></div>
+      <div id="uploaded-image-container" style="margin-top: 20px;">
+        <img id="uploaded-image" src="" alt="" style="max-width: 100%; display: none;" />
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Waste Classifier | Built with ❤️ for a cleaner planet</p>
+  </footer>
+
+  <script>
+    document.getElementById('upload-form').onsubmit = async (event) => {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const response = await fetch('/classify', { method: 'POST', body: formData });
+      const result = await response.json();
+
+      const resultDiv = document.getElementById('result');
+      const uploadedImage = document.getElementById('uploaded-image');
+      const uploadedImageContainer = document.getElementById('uploaded-image-container');
+
+      if (result.error) {
+        resultDiv.textContent = result.error;
+        uploadedImage.style.display = 'none';
+      } else {
+        resultDiv.textContent = `Predicted Class: ${result.predicted_class}`;
+        uploadedImage.src = result.image_url;
+        uploadedImage.style.display = 'block';
+      }
+    };
+  </script>
+</body>
+</html>
